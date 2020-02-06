@@ -1,0 +1,25 @@
+
+
+ÅySurface DetectionÅz
+py -3 CLI.py -f config.json -c sd 121.mp4 -r 0 -w 0 --seek 0 -s 100
+
+
+
+ÅyAnnotationÅz
+for %i in (*.jpg) do py "mark-corners.py" %i
+
+
+
+Åyexport images from videoÅz
+py -3 CLI.py -f config.json -c or 46.mp4 -r 0 -w 0 --seek 0 -s 100
+
+
+
+ÅySurface TransformationÅz
+py CLI.py -c st 66.mp4 -f  config.json
+
+
+ÅyContent ExtractionÅz
+py CLI.py -c ce 119.mp4 -f  config.json -s 100
+
+py -3 CLI.py -f config.json -c ce 90.mp4 -r 90 -w 0 --seek 0 -s 100
