@@ -25,10 +25,11 @@ function init() {
   bindKeyEvent();
 }
 
+//enable the shortcut keys
 function bindKeyEvent() {
   $(document).keydown(function(e) {
     switch (e.which) {
-      //H
+      //H for help message
       case 72:
         showShortCuts();
         break;
@@ -64,6 +65,7 @@ function bindKeyEvent() {
 
   $(document).keyup(function(e) {
     switch (e.which) {
+      //H
       case 72:
         hideShortCuts();
         break;
@@ -74,6 +76,7 @@ function bindKeyEvent() {
   });
 }
 
+//load the bottom layer canvas(original image)
 function initInputCanvas() {
   inputFileElement.addEventListener(
     "change",
@@ -90,6 +93,7 @@ function initInputCanvas() {
   };
 }
 
+//load the top layer canvas(mask image)
 function initOutputCanvas() {
   outputFileElement.addEventListener(
     "change",
@@ -108,6 +112,7 @@ function initOutputCanvas() {
   };
 }
 
+//it still need about 3 seconds after opencv.js loaded. So here is a 3-sec-length interval
 function onOpenCvReady() {
   var secondsLeft = 3;
   var countDown = setInterval(() => {
@@ -123,6 +128,7 @@ function onOpenCvReady() {
   }, 1000);
 }
 
+//drawing functions
 function initDrawingTool() {
   let painting = false;
   function startPosition(e) {
@@ -158,6 +164,7 @@ function initDrawingTool() {
   }
 }
 
+//toggle the pen color between white & black
 function swapColor() {
   const swapColorBtn = document.getElementById("swapColorBtn");
   if (swapColorBtn.className == "btn btn-dark btn-block") {
@@ -169,12 +176,14 @@ function swapColor() {
   }
 }
 
+//change width of pen
 function changePenWidth(x) {
   document.getElementById("slider_value").innerHTML = x;
   document.getElementById("penWidthRange").value = x;
   penWidth = x;
 }
 
+//change the opacity of mask
 function darker() {
   if (Number(canvas_mask.style.opacity) == 1) return;
   canvas_mask.style.opacity = "" + (Number(canvas_mask.style.opacity) + 0.1);
@@ -184,23 +193,24 @@ function lighter() {
   canvas_mask.style.opacity = "" + (Number(canvas_mask.style.opacity) - 0.1);
 }
 
+//download the modified mask as jpg file
 function exportMask(e) {
-    if(outputFileName == undefined){
-        return;
-    }
+  if (outputFileName == undefined) {
+    return;
+  }
   var imageURI = canvas_mask.toDataURL("image/jpg");
   e.href = imageURI;
   exportBtn.setAttribute("download", outputFileName);
 }
 
+//hold "H" will change the label/text to help message
 function showShortCuts() {
-  document.getElementById("penWidthDecrease").innerHTML = "(";
-  document.getElementById("penWidthIncrease").innerHTML = ")";
+  document.getElementById("penWidthDecrease").innerHTML = "[";
+  document.getElementById("penWidthIncrease").innerHTML = "]";
   document.getElementById("swapColorBtn").innerHTML = "Tab";
-  document.getElementById("opacityIncrease").innerHTML = "[";
-  document.getElementById("opacityDecrease").innerHTML = "]";
+  document.getElementById("opacityIncrease").innerHTML = "(";
+  document.getElementById("opacityDecrease").innerHTML = ")";
 }
-
 function hideShortCuts() {
   document.getElementById("penWidthDecrease").innerHTML = "1";
   document.getElementById("penWidthIncrease").innerHTML = "100";
