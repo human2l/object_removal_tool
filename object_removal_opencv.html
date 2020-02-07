@@ -28,7 +28,7 @@
         position: absolute;
         /* left: 0px; */
         /* top: 100px; */
-        margin: 20px;
+        margin: 10px;
         /* background: #ffffff; */
         border: thin solid #3f32ee;
       }
@@ -36,75 +36,107 @@
         position: absolute;
         /* left: 0px; */
         /* top: 100px; */
-        margin: 20px;
+        margin: 10px;
         border: thin solid #e60606;
       }
     </style>
     <title>Object Removal</title>
   </head>
   <body>
-    <div class="row">
-      <div class="col-3">
-        <h2>Object Removal</h2>
-      </div>
-      <div class="col-3">
-        <p id="status">OpenCV.js is loading...</p>
+    <div class="header bg-warning">
+      <div class="row mx-3">
+        <div class="col-3">
+          <h2>Object Removal</h2>
+        </div>
+        <div class="col-3">
+          <p id="status">OpenCV.js is loading...</p>
+        </div>
+        <div class="col-3">
+          <p>Hold "H" to see all the shortcuts!</p>
+        </div>
       </div>
     </div>
     <div class="content">
-      <div class="row">
-        <div class="col-5">
-          <div class="row">
-            <img id="inputImageSrc" alt="No Image" hidden />
-            <div class="col-3">
-              <p>Input image:</p>
+      <div class="content-top bg-warning">
+        <div class="row mx-3">
+          <div class="col-5">
+            <div class="row">
+              <img id="inputImageSrc" alt="No Image" hidden />
+              <div class="col-3">
+                <p>Input image:</p>
+              </div>
+              <div class="col-9">
+                <input type="file" id="fileInput" name="file" />
+              </div>
             </div>
-            <div class="col-9">
-              <input type="file" id="fileInput" name="file" />
+            <div class="row">
+              <img id="outputImageSrc" alt="No Image" hidden />
+              <div class="col-3">
+                <label for="fileOutput">Output image: </label>
+              </div>
+              <div class="col-9">
+                <input type="file" id="fileOutput" name="file" />
+              </div>
             </div>
           </div>
-          <div class="row">
-            <img id="outputImageSrc" alt="No Image" hidden />
-            <div class="col-3">
-              <label for="fileOutput">Output image: </label>
+          <div class="col-2">
+            <div class="row">
+              <label for="penWidthRange">Pen Width: </label>
+              <div class="text-danger ml-1" id="slider_value">30</div>
             </div>
-            <div class="col-9">
-              <input type="file" id="fileOutput" name="file" />
+            <div class="row">
+              <div class="mr-1" id="penWidthDecrease">1</div>
+              <input
+                type="range"
+                id="penWidthRange"
+                min="1"
+                max="100"
+                value="30"
+                onchange="changePenWidth(this.value)"
+              />
+              <div class="ml-1" id="penWidthIncrease">100</div>
             </div>
           </div>
-        </div>
-        <div class="col-3">
-          <div class="row">
-            <label for="penWidthRange">Pen Width: </label>
-            <span id="slider_value" style="color:red;">30</span>
+          <div class="col-2">
+            <div class="row">
+              <button
+                id="swapColorBtn"
+                class="btn btn-dark btn-block"
+                onclick="swapColor()"
+              >
+                Swap color
+              </button>
+            </div>
+            <div class="row mt-1">
+              <div class="col-4">
+                Opacity:
+              </div>
+              <div class="btn-group col-8">
+                <button
+                  id="opacityIncrease"
+                  class="btn btn-primary mr-1"
+                  onclick="darker()"
+                >
+                  +
+                </button>
+                <button
+                  id="opacityDecrease"
+                  class="btn btn-primary"
+                  onclick="lighter()"
+                >
+                  -
+                </button>
+              </div>
+            </div>
           </div>
-          1
-          <input
-            type="range"
-            id="penWidthRange"
-            min="1"
-            max="100"
-            value="30"
-            onchange="changePenWidth(this.value)"
-          />
-          100
-        </div>
-        <div class="col-1">
-          <div class="row">
-            <button
-              id="swapColorBtn"
-              class="btn btn-dark"
-              onclick="swapColor()"
+          <div class="col-3">
+            <a id="exportBtn" class="btn btn-success btn-block text-white p-4" onclick="exportMask(this)"
+              >Export Image</a
             >
-              Swap color
-            </button>
           </div>
-        </div>
-        <div class="col-2">
-            <a id="exportBtn" class="btn btn-primary" onclick="exportMask(this)">Export Image</a>
         </div>
       </div>
-      <div class="row my-3">
+      <div class="row my-3 ml-3">
         <canvas id="canvasImage"></canvas>
         <canvas id="canvasMask"></canvas>
       </div>

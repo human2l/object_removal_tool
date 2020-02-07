@@ -11,6 +11,7 @@ const canvasImage = document.getElementById("canvasImage");
 const canvasMask = document.getElementById("canvasMask");
 const exportBtn = document.getElementById("exportBtn");
 let penWidth = 30;
+let outputFileName = undefined;
 
 init();
 
@@ -26,19 +27,51 @@ function init() {
 
 function bindKeyEvent() {
   $(document).keydown(function(e) {
-    hideMask();
+    switch (e.which) {
+      //H
+      case 72:
+        showShortCuts();
+        break;
+      //9
+      case 57:
+        darker();
+        break;
+      //0
+      case 48:
+        lighter();
+        break;
+      //[
+      case 219:
+        if (penWidth == 1) break;
+        changePenWidth(penWidth - 1);
+        break;
+      //]
+      case 221:
+        if (penWidth == 100) break;
+        changePenWidth(penWidth + 1);
+        break;
+      //Tab
+      case 9:
+        swapColor();
+        break;
+      default:
+        // exit this handler for other keys
+        return;
+    }
+    //prevent default key actions
+    e.preventDefault();
   });
+
   $(document).keyup(function(e) {
-    showMask();
+    switch (e.which) {
+      case 72:
+        hideShortCuts();
+        break;
+      default:
+        return;
+    }
+    e.preventDefault();
   });
-
-  function hideMask() {
-    canvas_mask.style.opacity = "0.1";
-  }
-
-  function showMask() {
-    canvas_mask.style.opacity = "1";
-  }
 }
 
 function initInputCanvas() {
@@ -52,9 +85,6 @@ function initInputCanvas() {
   inputImgElement.onload = function() {
     let mat = cv.imread(inputImgElement);
     cv.imshow("canvasImage", mat);
-    // let dst = new cv.Mat();
-    // cv.cvtColor(mat, dst, cv.COLOR_RGBA2GRAY);
-    // cv.imshow("canvasImage", dst);
     mat.delete();
     canvasImage.hidden = false;
   };
@@ -65,26 +95,32 @@ function initOutputCanvas() {
     "change",
     e => {
       outputImgElement.src = URL.createObjectURL(e.target.files[0]);
+      outputFileName = e.target.files[0].name;
     },
     false
   );
   outputImgElement.onload = function() {
     let mat = cv.imread(outputImgElement);
-    cv.cvtColor(mat, mat, cv.COLOR_RGBA2GRAY);
-    // cv.cvtColor(mat, mat, CV_BGRA2BGR);
     cv.imshow("canvasMask", mat);
-
-    // let dst = new cv.Mat();
-    // cv.cvtColor(mat, dst, cv.COLOR_RGBA2GRAY);
-    // cv.imshow("canvasMask", dst);
     mat.delete();
     canvasMask.hidden = false;
+    canvas_mask.style.opacity = "0.1";
   };
 }
 
 function onOpenCvReady() {
-  content.hidden = false;
-  document.getElementById("status").innerHTML = "OpenCV.js is ready.";
+  var secondsLeft = 3;
+  var countDown = setInterval(() => {
+    if (secondsLeft == 0) {
+      clearInterval(countDown);
+      content.hidden = false;
+      document.getElementById("status").innerHTML = "OpenCV.js is ready!";
+    } else {
+      document.getElementById("status").innerHTML =
+        "OpenCV.js will be ready in " + secondsLeft;
+      secondsLeft--;
+    }
+  }, 1000);
 }
 
 function initDrawingTool() {
@@ -124,36 +160,51 @@ function initDrawingTool() {
 
 function swapColor() {
   const swapColorBtn = document.getElementById("swapColorBtn");
-  if (swapColorBtn.className == "btn btn-dark") {
-    swapColorBtn.className = "btn btn-light";
+  if (swapColorBtn.className == "btn btn-dark btn-block") {
+    swapColorBtn.className = "btn btn-light btn-block";
     ctx_mask.strokeStyle = "white";
   } else {
-    swapColorBtn.className = "btn btn-dark";
+    swapColorBtn.className = "btn btn-dark btn-block";
     ctx_mask.strokeStyle = "black";
   }
 }
 
 function changePenWidth(x) {
   document.getElementById("slider_value").innerHTML = x;
+  document.getElementById("penWidthRange").value = x;
   penWidth = x;
 }
 
+function darker() {
+  if (Number(canvas_mask.style.opacity) == 1) return;
+  canvas_mask.style.opacity = "" + (Number(canvas_mask.style.opacity) + 0.1);
+}
+function lighter() {
+  if (Number(canvas_mask.style.opacity) == 0.1) return;
+  canvas_mask.style.opacity = "" + (Number(canvas_mask.style.opacity) - 0.1);
+}
+
 function exportMask(e) {
-  console.log("in exportMask()");
-  //   dataUrl = canvas_mask.toDataURL(),
-  //   imageElement = document.createElement('img');
-  //   imageElement.src = dataUrl;
-  //   let mat = cv.imread(imageElement);
-  // //   let dst = new cv.Mat();
-  //     cv.cvtColor(mat, mat, cv.COLOR_RGBA2GRAY);
-  //     cv.cvtColor(mat, mat, CV_BGRA2BGR);
+    if(outputFileName == undefined){
+        return;
+    }
+  var imageURI = canvas_mask.toDataURL("image/jpg");
+  e.href = imageURI;
+  exportBtn.setAttribute("download", outputFileName);
+}
 
-//   var imageURI = canvas_mask.toDataURL("image/png");
-//   console.log(imageURI);
-//     e.href = imageURI;
-//     exportBtn.setAttribute("download","blah.png")
+function showShortCuts() {
+  document.getElementById("penWidthDecrease").innerHTML = "(";
+  document.getElementById("penWidthIncrease").innerHTML = ")";
+  document.getElementById("swapColorBtn").innerHTML = "Tab";
+  document.getElementById("opacityIncrease").innerHTML = "[";
+  document.getElementById("opacityDecrease").innerHTML = "]";
+}
 
-    var imageURI = canvas_mask.toDataURL("image/jpg");
-    e.href = imageURI;
-    exportBtn.setAttribute("download","blah.jpg")
+function hideShortCuts() {
+  document.getElementById("penWidthDecrease").innerHTML = "1";
+  document.getElementById("penWidthIncrease").innerHTML = "100";
+  document.getElementById("swapColorBtn").innerHTML = "Swap color";
+  document.getElementById("opacityIncrease").innerHTML = "+";
+  document.getElementById("opacityDecrease").innerHTML = "-";
 }

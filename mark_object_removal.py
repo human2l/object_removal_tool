@@ -12,12 +12,17 @@ class Annotation:
     def __init__(self, img_fname, mask_fname):
         self.img_fname = img_fname
         self.mask_fname = mask_fname
+        #load image to self.img
         self.img = cv2.imread(img_fname)
+        #resize self.img
         self.img  = cv2.resize(self.img , (self.IMG_SIZE, self.IMG_SIZE), interpolation=cv2.INTER_AREA) 
+        #load image to self.mask
         self.mask = cv2.imread(mask_fname, cv2.IMREAD_COLOR)
         self.width= self.mask.shape[0]
         self.height= self.mask.shape[1]
+        #resize self.mask
         self.mask = cv2.resize(self.mask , (self.IMG_SIZE, self.IMG_SIZE), interpolation=cv2.INTER_AREA)
+
         _, self.mask = cv2.threshold(self.mask, 100, 255, cv2.THRESH_BINARY)
         self.pointer = (-500, -500)
         self.pointer_size = 10
@@ -72,13 +77,19 @@ class Annotation:
 
     def redraw(self):
         if self.img is not None and self.mask is not None:
+            #addWeighted calculates the weighted sum of two arrays
             tmp = cv2.addWeighted(self.img, self.alpha, self.mask, 1 - self.alpha, 0)
+            #The function cv::circle draws a simple or filled circle with a given center and radius
             cv2.circle(tmp, self.pointer, self.pointer_size, self.annotation_color, 2)
+            
             cv2.imshow(self.window_title, tmp)
 
     def run(self):
+        #create a window as a placeholder for image
         cv2.namedWindow(self.window_title)
+        #set mouse handler for the window
         cv2.setMouseCallback(self.window_title, mouse_callback__, self)
+
         self.redraw()
         self.handle_keyboard()
         
